@@ -1,4 +1,4 @@
-// FINAL FIXED VERSION - NO ERRORS
+// FINAL WORKING VERSION - FIXED NULL ERROR
 (function() {
     console.log('🚀 Εκκίνηση αντιγραφής...');
     
@@ -16,7 +16,7 @@
             return;
         }
         
-        const htmlCode = htmlMatch[0]; // ΑΥΤΟ ΛΕΙΠΕΙ ΣΤΟΝ ΚΩΔΙΚΑ ΣΟΥ!
+        const htmlCode = htmlMatch[0];
         console.log('✅ Βρέθηκε HTML! Μήκος:', htmlCode.length, 'χαρακτήρες');
         
         // 3. Δημιούργησε το κουμπί
@@ -85,9 +85,17 @@
         
         buttonDiv.appendChild(copyBtn);
         
-        // 4. Βάλε το κουμπί ΠΡΙΝ από τον πρώτο τίτλο
-        const firstHeading = document.querySelector('h1, h2, .page-preview-item, .ck-content') || document.body;
-        firstHeading.parentNode.insertBefore(buttonDiv, firstHeading);
+        // 4. Βάλε το κουμπί ΣΩΣΤΑ (FIXED!)
+        const targetElement = document.querySelector('h1, h2, .page-preview-item, .ck-content, #code-container, pre, .content');
+        
+        if (targetElement && targetElement.parentNode) {
+            targetElement.parentNode.insertBefore(buttonDiv, targetElement);
+            console.log('✅ Το κουμπί προστέθηκε πριν από:', targetElement.tagName);
+        } else {
+            // Fallback: Βάλε το στην αρχή του body
+            document.body.insertBefore(buttonDiv, document.body.firstChild);
+            console.log('✅ Το κουμπί προστέθηκε στην αρχή της σελίδας');
+        }
         
         console.log('✅ Το κουμπί δημιουργήθηκε!');
     }
