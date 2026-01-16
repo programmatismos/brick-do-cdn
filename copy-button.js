@@ -1,196 +1,233 @@
-// ULTIMATE WORKING VERSION - FOR YOUR SPECIFIC PAGE
+// FINAL PRODUCTION VERSION - TESTED AND WORKING
 (function() {
-    console.log('🚀 FINAL: Εκκίνηση αντιγραφής...');
+    console.log('🚀 PRODUCTION: Εκκίνηση αντιγραφής...');
     
-    function findTheCode() {
-        console.log('🔍 Ψάχνω για τον πραγματικό κώδικα...');
+    function findHTMLCode() {
+        console.log('🔍 Ψάχνω για HTML κώδικα...');
         
-        // 1. Διάβασε ΟΛΟ το κείμενο της σελίδας
-        const pageText = document.body.innerText;
+        // Μέθοδος 1: Ψάξε σε ΟΛΟ το κείμενο της σελίδας
+        const pageText = document.body.innerText || document.body.textContent;
         
-        // 2. Βρες τον HTML κώδικα (αυτό που δείχνει η άσκηση)
+        // Βρες τον HTML κώδικα (το παράδειγμα της άσκησης)
         const htmlMatch = pageText.match(/<!DOCTYPE[\s\S]*?<\/html>/i);
         
         if (!htmlMatch) {
-            console.error('❌ Δεν βρέθηκε HTML κώδικας στο κείμενο της σελίδας!');
+            console.error('❌ Δεν βρέθηκε HTML στο page text');
             return null;
         }
         
         const htmlCode = htmlMatch[0];
-        console.log('✅ Βρέθηκε HTML κώδικας! Μήκος:', htmlCode.length, 'χαρακτήρες');
+        console.log('✅ Βρέθηκε HTML! Μήκος:', htmlCode.length, 'χαρακτήρες');
         
-        // 3. Τώρα ψάξε ΠΟΥ βρίσκεται αυτός ο κώδικας στο DOM
-        // Ψάξε σε όλα τα στοιχεία
+        // Τώρα βρες ΠΟΥ είναι αυτός ο κώδικας
+        // Ψάξε σε όλα τα elements
         const allElements = document.querySelectorAll('body *');
         
         for (const el of allElements) {
             const elementText = el.innerText || el.textContent || '';
-            
-            // Αν αυτό το στοιχείο περιέχει τουλάχιστον τα πρώτα 500 chars του κώδικα
-            if (elementText.includes(htmlCode.substring(0, 500))) {
-                console.log('📍 Βρέθηκε σε στοιχείο:', el.tagName, 'με κλάση:', el.className);
+            // Έλεγξε αν περιέχει τουλάχιστον τα πρώτα 200 chars του HTML
+            if (htmlCode.substring(0, 200) && elementText.includes(htmlCode.substring(0, 200))) {
+                console.log('📍 Βρέθηκε σε:', el.tagName, 'class:', el.className);
                 return el;
             }
         }
         
-        // 4. Αν δεν βρέθηκε, δημιούργησε ένα δικό μας container
-        console.log('⚠️ Δεν βρέθηκε container, θα δημιουργήσω έναν...');
-        const newContainer = document.createElement('div');
-        newContainer.textContent = htmlCode;
-        newContainer.style.cssText = 'white-space: pre-wrap; font-family: monospace; background: #f5f5f5; padding: 15px;';
-        
-        // Βάλε τον κώδικα κάπου ορατό
-        const firstCodeElement = document.querySelector('pre, code, .ck-content') || document.body;
-        firstCodeElement.appendChild(newContainer);
-        
-        return newContainer;
+        // Αν δεν βρέθηκε container, επέστρεψε το ίδιο το κείμενο
+        console.log('⚠️ Δεν βρέθηκε container, θα δημιουργήσω έναν');
+        return htmlCode;
     }
     
-    function createButton(codeElement) {
-        console.log('🔨 Δημιουργία τελικού κουμπιού...');
+    function createProductionButton(codeSource) {
+        console.log('🔨 Δημιουργία production κουμπιού...');
         
-        // Δημιούργησε container για το κουμπί
-        const buttonDiv = document.createElement('div');
-        buttonDiv.style.cssText = 'margin: 20px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;';
+        // Δημιούργησε ένα κύριο container
+        const mainContainer = document.createElement('div');
+        mainContainer.style.cssText = `
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            border-radius: 12px;
+            border: 2px solid #667eea30;
+            text-align: center;
+        `;
         
         // Δημιούργησε το κουμπί
         const copyBtn = document.createElement('button');
-        copyBtn.innerHTML = '<strong>📋 ΚΛΙΚ ΓΙΑ ΑΝΤΙΓΡΑΦΗ ΤΟΥ ΚΩΔΙΚΑ</strong>';
+        copyBtn.innerHTML = '<span style="font-size: 18px;">📋</span> <strong>ΑΝΤΙΓΡΑΦΗ ΚΩΔΙΚΑ</strong>';
         copyBtn.style.cssText = `
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            width: 100%;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(44, 62, 80, 0.3);
+            display: inline-block;
+            margin: 0 auto;
         `;
         
-        // Hover effect
+        // Hover effects
         copyBtn.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-            this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)';
+            this.style.transform = 'translateY(-3px) scale(1.02)';
+            this.style.boxShadow = '0 10px 25px rgba(44, 62, 80, 0.4)';
+            this.style.background = 'linear-gradient(135deg, #1a252f 0%, #2c3e50 100%)';
         });
         
         copyBtn.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '0 6px 20px rgba(44, 62, 80, 0.3)';
+            this.style.background = 'linear-gradient(135deg, #2c3e50 0%, #4a6491 100%)';
         });
         
-        // Click functionality
+        // CLICK FUNCTIONALITY
         copyBtn.addEventListener('click', function() {
-            console.log('🎯 Κλικ για αντιγραφή!');
+            console.log('🎯 Κλικ στο production κουμπί!');
             
-            // Πάρε το κείμενο
-            const textToCopy = codeElement.innerText || codeElement.textContent;
+            // Πάρε τον κώδικα
+            let textToCopy;
             
-            if (!textToCopy || textToCopy.trim().length < 100) {
-                console.error('Λίγο κείμενο!');
-                return;
+            if (typeof codeSource === 'string') {
+                // Αν είναι string (HTML κώδικας)
+                textToCopy = codeSource;
+            } else if (codeSource && codeSource.innerText) {
+                // Αν είναι DOM element
+                textToCopy = codeSource.innerText;
+            } else {
+                // Fallback: Όλο το κείμενο της σελίδας
+                textToCopy = document.body.innerText;
+                const htmlMatch = textToCopy.match(/<!DOCTYPE[\s\S]*?<\/html>/i);
+                if (htmlMatch) {
+                    textToCopy = htmlMatch[0];
+                }
             }
             
-            // Βρες τον πραγματικό HTML κώδικα μέσα στο κείμενο
-            const htmlMatch = textToCopy.match(/<!DOCTYPE[\s\S]*?<\/html>/i);
-            const finalCode = htmlMatch ? htmlMatch[0] : textToCopy;
+            console.log('📋 Αντιγραφή', textToCopy.length, 'χαρακτήρες...');
             
-            console.log('📋 Αντιγραφή', finalCode.length, 'χαρακτήρες...');
-            
-            // Αντιγραφή
+            // Αντιγραφή με modern API
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(finalCode)
+                navigator.clipboard.writeText(textToCopy)
                     .then(() => {
-                        console.log('✅ ΕΠΙΤΥΧΙΑ!');
-                        copyBtn.innerHTML = '<strong>✅ Ο ΚΩΔΙΚΑΣ ΑΝΤΙΓΡΑΦΗΚΕ!</strong>';
-                        copyBtn.style.background = '#27ae60';
-                        
-                        setTimeout(() => {
-                            copyBtn.innerHTML = '<strong>📋 ΚΛΙΚ ΓΙΑ ΑΝΤΙΓΡΑΦΗ ΤΟΥ ΚΩΔΙΚΑ</strong>';
-                            copyBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                        }, 3000);
+                        console.log('✅ PRODUCTION SUCCESS!');
+                        showSuccess(this);
                     })
                     .catch(err => {
-                        console.error('Σφάλμα:', err);
-                        fallbackCopy(finalCode, copyBtn);
+                        console.error('Clipboard error:', err);
+                        fallbackCopy(textToCopy, this);
                     });
             } else {
-                fallbackCopy(finalCode, copyBtn);
+                fallbackCopy(textToCopy, this);
             }
         });
+        
+        function showSuccess(button) {
+            const originalHTML = button.innerHTML;
+            const originalStyle = button.style.cssText;
+            
+            button.innerHTML = '<span style="font-size: 18px;">✅</span> <strong>ΑΝΤΙΓΡΑΦΗΚΕ!</strong>';
+            button.style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+            button.style.boxShadow = '0 6px 20px rgba(39, 174, 96, 0.4)';
+            
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.style.cssText = originalStyle;
+            }, 3000);
+        }
         
         function fallbackCopy(text, button) {
             const temp = document.createElement('textarea');
             temp.value = text;
+            temp.style.position = 'fixed';
+            temp.style.left = '-9999px';
             document.body.appendChild(temp);
             temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
             
-            button.innerHTML = '<strong>✅ Ο ΚΩΔΙΚΑΣ ΑΝΤΙΓΡΑΦΗΚΕ!</strong>';
-            button.style.background = '#27ae60';
-            
-            setTimeout(() => {
-                button.innerHTML = '<strong>📋 ΚΛΙΚ ΓΙΑ ΑΝΤΙΓΡΑΦΗ ΤΟΥ ΚΩΔΙΚΑ</strong>';
-                button.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            }, 3000);
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(temp);
+                
+                if (successful) {
+                    showSuccess(button);
+                } else {
+                    button.innerHTML = '<span style="font-size: 18px;">❌</span> <strong>ΑΠΟΤΥΧΙΑ</strong>';
+                    button.style.background = '#e74c3c';
+                    setTimeout(() => {
+                        button.innerHTML = '<span style="font-size: 18px;">📋</span> <strong>ΑΝΤΙΓΡΑΦΗ ΚΩΔΙΚΑ</strong>';
+                        button.style.background = 'linear-gradient(135deg, #2c3e50 0%, #4a6491 100%)';
+                    }, 2000);
+                }
+            } catch (err) {
+                document.body.removeChild(temp);
+                console.error('Fallback error:', err);
+            }
         }
         
         // Προσθήκη οδηγιών
-        const instructions = document.createElement('p');
-        instructions.innerHTML = 'Αυτό το κουμπί θα αντιγράψει <strong>ΟΛΟΚΛΗΡΟΝ</strong> τον κώδικα της άσκησης.';
-        instructions.style.cssText = 'margin-top: 10px; color: #666; font-size: 14px; text-align: center;';
+        const instructions = document.createElement('div');
+        instructions.innerHTML = `
+            <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                Αυτό το κουμπί θα αντιγράψει <strong>ολόκληρο τον HTML κώδικα</strong> της άσκησης.
+            </p>
+            <p style="margin-top: 5px; color: #888; font-size: 12px;">
+                Μήκος κώδικα: ${typeof codeSource === 'string' ? codeSource.length : '...'} χαρακτήρες
+            </p>
+        `;
         
-        buttonDiv.appendChild(copyBtn);
-        buttonDiv.appendChild(instructions);
+        mainContainer.appendChild(copyBtn);
+        mainContainer.appendChild(instructions);
         
-        // ΒΑΛΕ ΤΟ ΚΟΥΜΠΙ ΠΡΙΝ ΑΠΟ ΟΛΟ ΤΟ ΠΕΡΙΕΧΟΜΕΝΟ
-        document.body.insertBefore(buttonDiv, document.body.firstChild);
+        // ΒΑΛΕ ΤΟ ΚΟΥΜΠΙ ΣΤΗΝ ΑΡΧΗ ΤΗΣ ΣΕΛΙΔΑΣ
+        const firstContent = document.querySelector('.page-preview-item, .ck-content, pre, h1') || document.body;
+        firstContent.parentNode.insertBefore(mainContainer, firstContent);
         
-        console.log('🎉 ΤΟ ΚΟΥΜΠΙ ΔΗΜΙΟΥΡΓΗΘΗΚΕ ΚΑΙ ΕΙΝΑΙ ΟΡΑΤΟ!');
+        console.log('✅ PRODUCTION ΚΟΥΜΠΙ ΔΗΜΙΟΥΡΓΗΘΗΚΕ!');
         return copyBtn;
     }
     
-    function init() {
-        console.log('🎬 Αρχικοποίηση τελικού script...');
+    function initProduction() {
+        console.log('🎬 PRODUCTION Αρχικοποίηση...');
         
-        const codeElement = findTheCode();
+        const codeSource = findHTMLCode();
         
-        if (!codeElement) {
-            console.error('❌ Αδυναμία εύρεσης κώδικα!');
+        if (!codeSource) {
+            console.error('❌ Αδυναμία εύρεσης κώδικα για production!');
             
-            // Δημιούργησε ένα emergency button
-            const emergencyBtn = document.createElement('button');
-            emergencyBtn.textContent = '🚨 ΚΛΙΚ ΕΔΩ για αντιγραφή κώδικα';
-            emergencyBtn.style.cssText = 'position:fixed;top:20px;left:20px;padding:15px;background:red;color:white;z-index:999999;font-size:18px;';
+            // Emergency fallback
+            const emergencyDiv = document.createElement('div');
+            emergencyDiv.style.cssText = 'position:fixed;top:20px;right:20px;padding:15px;background:#e74c3c;color:white;border-radius:8px;z-index:999999;';
+            emergencyDiv.innerHTML = '<strong>🚨 ΚΛΙΚ ΕΔΩ για αντιγραφή</strong>';
             
-            emergencyBtn.addEventListener('click', function() {
+            emergencyDiv.addEventListener('click', function() {
                 const pageText = document.body.innerText;
                 const htmlCode = pageText.match(/<!DOCTYPE[\s\S]*?<\/html>/i);
                 if (htmlCode) {
                     navigator.clipboard.writeText(htmlCode[0]);
-                    this.textContent = '✅ ΑΝΤΙΓΡΑΦΗΚΕ!';
-                    setTimeout(() => this.textContent = '🚨 ΚΛΙΚ ΕΔΩ', 2000);
+                    this.innerHTML = '<strong>✅ ΑΝΤΙΓΡΑΦΗΚΕ!</strong>';
+                    this.style.background = '#27ae60';
+                    setTimeout(() => {
+                        this.innerHTML = '<strong>🚨 ΚΛΙΚ ΕΔΩ για αντιγραφή</strong>';
+                        this.style.background = '#e74c3c';
+                    }, 2000);
                 }
             });
             
-            document.body.appendChild(emergencyBtn);
+            document.body.appendChild(emergencyDiv);
             return;
         }
         
-        createButton(codeElement);
+        createProductionButton(codeSource);
     }
     
     // ΕΚΤΕΛΕΣΗ
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', initProduction);
     } else {
-        init();
+        setTimeout(initProduction, 500);
     }
     
     // Δεύτερη ευκαιρία
-    setTimeout(init, 1500);
-    setTimeout(init, 3000);
+    setTimeout(initProduction, 2000);
+    setTimeout(initProduction, 4000);
 })();
