@@ -1,108 +1,163 @@
-// SIMPLE WORKING VERSION - Targets the correct textarea
+// UPDATED VERSION - For PRE element not textarea
 (function() {
-    console.log('🚀 Αρχικοποίηση αντιγραφής...');
+    console.log('🚀 Αρχικοποίηση αντιγραφής κώδικα...');
     
     function init() {
-        // Ψάχνουμε ΣΥΓΚΕΚΡΙΜΕΝΑ το textarea με όνομα 'ex_4_2_a'
-        const targetTextarea = document.querySelector('textarea[name="ex_4_2_a"]');
+        console.log('🔍 Αναζήτηση κώδικα στη σελίδα...');
         
-        if (!targetTextarea) {
-            console.error('❌ Δεν βρέθηκε το συγκεκριμένο textarea');
-            return;
+        // 1. Βρες τον κώδικα στο PRE element
+        const codePre = document.querySelector('pre');
+        
+        if (!codePre) {
+            console.error('❌ Δεν βρέθηκε PRE element με κώδικα');
+            
+            // Εναλλακτική: Ψάξε για textarea (αν υπάρχει)
+            const textarea = document.querySelector('textarea');
+            if (textarea) {
+                console.log('✅ Βρέθηκε textarea:', textarea);
+                codePre = textarea;
+            } else {
+                return;
+            }
         }
         
-        console.log('✅ Βρέθηκε το textarea με τον κώδικα!');
+        console.log('✅ Βρέθηκε κώδικας:', codePre);
+        console.log('📏 Μήκος:', codePre.textContent.length, 'χαρακτήρες');
         
-        // Δημιουργούμε ένα container για το κουμπί
+        // 2. Δημιούργησε container για το κουμπί
         const buttonContainer = document.createElement('div');
-        buttonContainer.style.cssText = 'margin-bottom: 15px; text-align: right;';
+        buttonContainer.style.cssText = `
+            margin-bottom: 15px;
+            text-align: right;
+        `;
         
-        // Δημιουργούμε το κουμπί
+        // 3. Δημιούργησε το κουμπί
         const copyBtn = document.createElement('button');
         copyBtn.textContent = '📋 Αντιγραφή Κώδικα';
         copyBtn.style.cssText = `
             padding: 10px 20px;
-            background: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: bold;
-            transition: background 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: all 0.3s ease;
+            display: inline-block;
         `;
         
-        // Προσθέτουμε τη λειτουργία αντιγραφής
+        // 4. Προσθήκη hover effect
+        copyBtn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)';
+        });
+        
+        copyBtn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+        });
+        
+        // 5. Προσθήκη click functionality
         copyBtn.addEventListener('click', function() {
-            console.log('Κλικ στο κουμπί αντιγραφής');
+            console.log('🖱️ Κλικ για αντιγραφή κώδικα');
             
-            // Επιλέγουμε και αντιγράφουμε το κείμενο
-            targetTextarea.select();
-            const textToCopy = targetTextarea.value;
+            // Πάρε το κείμενο από το PRE
+            const textToCopy = codePre.textContent || codePre.innerText;
             
-            // Προσπαθούμε με το σύγχρονο Clipboard API
+            console.log('📋 Κείμενο για αντιγραφή:', textToCopy.substring(0, 100) + '...');
+            
+            // Αντιγραφή
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy)
                     .then(() => {
-                        copyBtn.textContent = '✅ Αντιγράφηκε!';
-                        copyBtn.style.background = '#27ae60';
-                        setTimeout(() => {
-                            copyBtn.textContent = '📋 Αντιγραφή Κώδικα';
-                            copyBtn.style.background = '#2c3e50';
-                        }, 2000);
+                        console.log('✅ Αντιγράφηκε επιτυχώς!');
+                        showSuccess(this);
                     })
                     .catch(err => {
-                        console.warn('Σφάλμα με Clipboard API, δοκιμάζω fallback:', err);
-                        fallbackCopy(textToCopy);
+                        console.warn('⚠️ Σφάλμα με clipboard API:', err);
+                        fallbackCopy(textToCopy, this);
                     });
             } else {
-                fallbackCopy(textToCopy);
-            }
-            
-            // Fallback μέθοδος για παλιά προγράμματα περιήγησης
-            function fallbackCopy(text) {
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                textArea.style.position = 'fixed';
-                textArea.style.opacity = '0';
-                document.body.appendChild(textArea);
-                textArea.select();
-                
-                try {
-                    document.execCommand('copy');
-                    copyBtn.textContent = '✅ Αντιγράφηκε!';
-                    copyBtn.style.background = '#27ae60';
-                    setTimeout(() => {
-                        copyBtn.textContent = '📋 Αντιγραφή Κώδικα';
-                        copyBtn.style.background = '#2c3e50';
-                    }, 2000);
-                } catch (err) {
-                    console.error('Fallback copy failed:', err);
-                }
-                
-                document.body.removeChild(textArea);
+                fallbackCopy(textToCopy, this);
             }
         });
         
-        // Προσθέτουμε hover effect (προαιρετικό)
-        copyBtn.addEventListener('mouseenter', () => {
-            copyBtn.style.background = '#1a252f';
-        });
-        copyBtn.addEventListener('mouseleave', () => {
-            copyBtn.style.background = '#2c3e50';
-        });
-        
-        // Συνδέουμε τα πάντα
+        // 6. Προσθήκη του κουμπιού πριν από τον κώδικα
+        codePre.parentNode.insertBefore(buttonContainer, codePre);
         buttonContainer.appendChild(copyBtn);
-        targetTextarea.parentNode.insertBefore(buttonContainer, targetTextarea);
         
-        console.log('✅ Το κουμπί αντιγραφής προστέθηκε επιτυχώς πριν από τον κώδικα!');
+        console.log('✅ Το κουμπί προστέθηκε ΠΡΙΝ από τον κώδικα!');
+        
+        // 7. Βοηθητικές συναρτήσεις
+        function showSuccess(button) {
+            const originalText = button.textContent;
+            const originalBg = button.style.background;
+            
+            button.textContent = '✅ Αντιγράφηκε!';
+            button.style.background = '#27ae60';
+            button.style.boxShadow = '0 4px 20px rgba(39, 174, 96, 0.4)';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = originalBg;
+                button.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+            }, 2000);
+        }
+        
+        function fallbackCopy(text, button) {
+            console.log('🔄 Χρήση fallback method...');
+            
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = text;
+            tempTextarea.style.position = 'fixed';
+            tempTextarea.style.left = '-9999px';
+            tempTextarea.style.opacity = '0';
+            document.body.appendChild(tempTextarea);
+            
+            tempTextarea.select();
+            tempTextarea.setSelectionRange(0, 99999);
+            
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(tempTextarea);
+                
+                if (successful) {
+                    console.log('✅ Αντιγράφηκε με fallback!');
+                    showSuccess(button);
+                } else {
+                    console.error('❌ Αποτυχία fallback');
+                    showError(button);
+                }
+            } catch (err) {
+                document.body.removeChild(tempTextarea);
+                console.error('❌ Σφάλμα:', err);
+                showError(button);
+            }
+        }
+        
+        function showError(button) {
+            const originalText = button.textContent;
+            
+            button.textContent = '❌ Σφάλμα';
+            button.style.background = '#e74c3c';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }, 2000);
+        }
     }
     
-    // Εκτελούμε όταν φορτωθεί η σελίδα
+    // Εκτέλεση
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
+    
+    // Επαναπροσπάθεια μετά από 1 δευτερόλεπτο
+    setTimeout(init, 1000);
 })();
