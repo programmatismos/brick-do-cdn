@@ -1,49 +1,38 @@
-// FINAL VERSION - ΕΓΚΥΡΗ
+// ULTIMATE VERSION - For .ck-content DIV instead of textarea
 (function() {
     console.log('🚀 Αρχικοποίηση Copy Button System...');
     
     function initializeCopyButton() {
         console.log('🔍 Αναζήτηση στοιχείων...');
         
-        // 1. ΒΡΕΣ ΟΛΑ ΤΑ TEXTAREAS
-        const allTextareas = document.querySelectorAll('textarea');
-        console.log('📝 Βρέθηκαν textareas:', allTextareas.length);
+        // 1. ΒΡΕΣ ΤΟ DIV ΜΕ ΤΟΝ ΚΩΔΙΚΑ (.ck-content)
+        const codeDiv = document.querySelector('.ck-content');
         
-        // 2. ΒΡΕΣ ΤΟ ΚΥΡΙΟ TEXTAREA (αυτό με τον κώδικα)
-        let targetTextarea = null;
-        
-        // Προτεραιότητα 1: Textarea με συγκεκριμένο όνομα
-        targetTextarea = document.querySelector('textarea[name="ex_4_2_a"]');
-        
-        // Προτεραιότητα 2: Το μεγαλύτερο textarea
-        if (!targetTextarea && allTextareas.length > 0) {
-            targetTextarea = Array.from(allTextareas).reduce((largest, current) => {
-                return (current.value.length > largest.value.length) ? current : largest;
-            });
+        if (!codeDiv) {
+            console.error('❌ ΔΕΝ ΒΡΕΘΗΚΕ .ck-content div!');
+            // Εναλλακτική αναζήτηση
+            const allPreElements = document.querySelectorAll('pre');
+            if (allPreElements.length > 0) {
+                codeDiv = allPreElements[0];
+                console.log('✅ Βρέθηκε εναλλακτικό pre element:', codeDiv);
+            } else {
+                return;
+            }
+        } else {
+            console.log('✅ Βρέθηκε .ck-content div:', codeDiv);
         }
         
-        // Προτεραιότητα 3: Το πρώτο textarea
-        if (!targetTextarea && allTextareas.length > 0) {
-            targetTextarea = allTextareas[0];
-        }
+        console.log('📏 Μήκος κειμένου:', (codeDiv.innerText || codeDiv.textContent).length, 'χαρακτήρες');
         
-        if (!targetTextarea) {
-            console.error('❌ ΔΕΝ ΒΡΕΘΗΚΕ textarea!');
-            return;
-        }
-        
-        console.log('✅ Βρέθηκε textarea:', targetTextarea);
-        console.log('📏 Μήκος κειμένου:', targetTextarea.value.length, 'χαρακτήρες');
-        
-        // 3. ΒΡΕΣ ΤΟ CONTAINER
-        let container = targetTextarea.closest('.page-preview-item, .ck-content, div, pre');
+        // 2. ΒΡΕΣ ΤΟ CONTAINER
+        let container = codeDiv.closest('.page-preview-item, .ck-content, div, pre');
         if (!container) {
-            container = targetTextarea.parentElement;
+            container = codeDiv.parentElement;
         }
         
         console.log('📦 Container:', container);
         
-        // 4. ΔΗΜΙΟΥΡΓΙΑ ΚΟΥΜΠΙΟΥ
+        // 3. ΔΗΜΙΟΥΡΓΙΑ ΚΟΥΜΠΙΟΥ
         const copyBtn = document.createElement('button');
         copyBtn.id = 'copy-code-btn-' + Date.now();
         copyBtn.innerHTML = '📋 Αντιγραφή Κώδικα';
@@ -78,39 +67,39 @@
             copyBtn.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
         });
         
-        // 5. CLICK FUNCTIONALITY
+        // 4. CLICK FUNCTIONALITY
         copyBtn.addEventListener('click', function(event) {
             console.log('🖱️ Κλικ στο κουμπί αντιγραφής');
             event.preventDefault();
             event.stopPropagation();
             
-            // Επιλογή κειμένου
-            targetTextarea.select();
-            targetTextarea.setSelectionRange(0, 999999);
+            // Πάρε το κείμενο από το div
+            const text = codeDiv.innerText || codeDiv.textContent;
+            console.log('📋 Κείμενο για αντιγραφή:', text.substring(0, 100) + '...');
             
-            // Δοκιμή αντιγραφής
-            copyToClipboard(targetTextarea.value, copyBtn);
+            // Αντιγραφή στο clipboard
+            copyToClipboard(text, copyBtn);
         });
         
-        // 6. ΒΑΛΕ ΤΟ CONTAINER ΣΕ RELATIVE
+        // 5. ΒΑΛΕ ΤΟ CONTAINER ΣΕ RELATIVE
         container.style.position = 'relative';
-        if (!container.style.paddingTop || container.style.paddingTop < '50px') {
+        if (!container.style.paddingTop || parseInt(container.style.paddingTop) < 50) {
             container.style.paddingTop = '60px';
         }
         
-        // 7. ΠΡΟΣΘΗΚΗ ΚΟΥΜΠΙΟΥ
+        // 6. ΠΡΟΣΘΗΚΗ ΚΟΥΜΠΙΟΥ
         container.appendChild(copyBtn);
         
         console.log('✅ Το κουμπί προστέθηκε επιτυχώς! ID:', copyBtn.id);
         
-        // 8. ΔΗΜΙΟΥΡΓΙΑ TEST BUTTON (για debugging)
-        createTestButton(targetTextarea);
+        // 7. ΔΗΜΙΟΥΡΓΙΑ TEST BUTTON (για debugging)
+        createTestButton(codeDiv);
     }
     
     function copyToClipboard(text, button) {
         console.log('📋 Προσπάθεια αντιγραφής...');
         
-        // ΜΟΝΤΕΡΝ ΜΕΘΟΔΟΣ
+        // ΜΟΝΤΕΡΝ ΜΕΘΟΔΟΣ (Clipboard API)
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text)
                 .then(() => {
@@ -134,6 +123,7 @@
         tempTextarea.value = text;
         tempTextarea.style.position = 'fixed';
         tempTextarea.style.left = '-9999px';
+        tempTextarea.style.opacity = '0';
         document.body.appendChild(tempTextarea);
         
         tempTextarea.select();
@@ -184,7 +174,7 @@
         }, 2000);
     }
     
-    function createTestButton(textarea) {
+    function createTestButton(codeDiv) {
         // Πρόσθεσε ένα test button για debugging
         const testBtn = document.createElement('button');
         testBtn.textContent = '🔧 TEST';
@@ -203,13 +193,18 @@
         `;
         
         testBtn.addEventListener('click', () => {
-            console.log('🧪 TEST: Current textarea value:', textarea.value.substring(0, 100) + '...');
-            console.log('🧪 TEST: Textarea element:', textarea);
-            alert('TEST: Textarea found with ' + textarea.value.length + ' characters');
+            const text = codeDiv.innerText || codeDiv.textContent;
+            console.log('🧪 TEST: Κείμενο από div:', text.substring(0, 150) + '...');
+            console.log('🧪 TEST: Div element:', codeDiv);
+            alert('TEST: Βρέθηκε κείμενο με ' + text.length + ' χαρακτήρες');
         });
         
         document.body.appendChild(testBtn);
-        setTimeout(() => document.body.removeChild(testBtn), 10000);
+        setTimeout(() => {
+            if (document.body.contains(testBtn)) {
+                document.body.removeChild(testBtn);
+            }
+        }, 10000);
     }
     
     // ΕΚΤΕΛΕΣΗ
